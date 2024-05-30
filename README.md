@@ -14,10 +14,12 @@ Running an off-chain relayer for cross-chain applications built on wormhole is n
 - ensuring **every vaa** is redeemed
 - managing contract interfaces across ecosystems
 - securely providing funds to pay for relaying
+- calculating the correct fee that should be charged for a relay based on current network conditions
+- tracking the tokens inflows and outflows
 - mantaining relay-protocol contracts configuration up to date
 - many, many more...
 
-This gets particularly difficult when you need to run many production grade relayers, like we do at [xLabs](https://xlabs.xyz/).
+This gets particularly difficult when you need to run **many** production grade relayers, like we do at [xLabs](https://xlabs.xyz/).
 
 Enter **Kamaji**, an engine to run and service an ***ecosystem of relayers***.
 
@@ -27,7 +29,7 @@ Enter **Kamaji**, an engine to run and service an ***ecosystem of relayers***.
 ### Client Components:
 
 - **Relayer:** Clients that perform relay. They can be uniquely identified by an ID provided. This ID will be used to login against keycloak This id will have a KMS role associated with it, which will determine what wallets the relayer can use, and how it can use them.
-- **Oracle Tasks:** Worker running contract update tasks when this is required.
+- **Oracle Tasks:** Worker running contract update tasks when this is required. The hooks to understand when this is required are provided by the infrastructure.
 
 ### Service Components:
 
