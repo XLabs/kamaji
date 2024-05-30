@@ -1,5 +1,15 @@
+# Kamaji
 ![kamaji](https://github.com/XLabs/kamaji/assets/12457451/bf60762f-3028-4611-b1db-e0cc66706103)
-# Why:
+## What:
+Kamaji is a relay-engine modeled as a "service registry" where clients can register their needs to be serviced. As such there are two main roles to distinguish:
+- Clients: Mainly Relayers and Oracles. The engine focuses on simplifying the spawning and management of this components with minimal code, making it easy to spawn dozens if not hundreds of reliable, predictable, observable relayers.
+- Services: Components purposed to assist clients in performing their tasks by managing all the environment related complexity (rpc pools, wallets, security, pnl tracking, error handling, monitoring, alerting).
+
+This aims to abstract all environment complexity out of a relayer, with two main purposes:
+- Allowing the relayer to focus only on the business logic
+- Reusing all infrastructure related code. (TODO: link quote to why)
+
+## Why:
 Running an off-chain relayer for cross-chain applications built on wormhole is no easy task. There are multiple things you need to juggle simultaneously: 
 - ensuring **every vaa** is redeemed
 - managing contract interfaces across ecosystems
@@ -11,17 +21,7 @@ This gets particularly difficult when you need to run many production grade rela
 
 Enter **Kamaji**, an engine to run and service an ***ecosystem of relayers***.
 
-# What:
-## High Level Architecture:
-This relay-engine is modeled "service registry" where clients can register their needs to be serviced. As such there are two main roles to distinguish:
-- Clients: Mmainly Relayers and Oracles. The engine focuses on simplifying the spawning and management of this components with minimal code, making it easy to spawn dozens if not hundreds of reliable, predictable, observable relayers.
-- Services: Components purposed to assist clients in performing their tasks by managing all the environment related complexity (rpc pools, wallets, security, pnl tracking, error handling, monitoring, alerting).
-
-This aims to abstract away environment complexity out of a relayer, with two main purposes:
-- Allowing the relayer to focus only on the business logic
-- Reusing all infrastructure related code. (TODO: link quote to why)
-
-
+## 10,000 feet view:
 ![image](https://github.com/XLabs/kamaji/assets/12457451/d8c7d0cb-9873-4506-bd74-656e7141b290)
 
 ### Client Components:
@@ -32,17 +32,16 @@ This aims to abstract away environment complexity out of a relayer, with two mai
 ### Service Components:
 
 - **Kamaji:** Acts as a gateway to orchestrate all relay-related services
-- **VAA Stream Registry:** Registers relayers interested in VAA streams and the status of those VAAs.
+- **VAA Stream Registry:** Registers the interest of clients on VAA streams and the status of those VAAs for specific relayers.
 - **Vaa Scanner:** Uses as many sources as possible to keep the relayers in the VAA stream registry as up-to-date as possible with the VAAs signed.
 - **Key Cloak:** Authorization service that allows a relayer to assume a KMS role
 - **KMS:** Key management system. Contains a set of roles, each of which has access to certain actions over certain wallets
 - **Accountant:** Keeps track of the cost and benefit of operations relayed.
 - **Oracle:** Takes care of monitoring block-chains to provide hooks for oracle-tasks
 
+## Components:
 
-# Components:
-
-## Relayer:
+### Relayer:
 
 A relayer can be considered a lambda function that needs to be serviced with:
 
@@ -83,7 +82,7 @@ With this simple six properties interface, Kamaji could service a relayer to hel
 - Providing the relayer with an RPC pool that always contains healthy RPCs
 - Monitoring and broadcasting the result of VAA execution, including its economic results
 
-### Relayer Bootstrap:
+**Relayer Bootstrap:**
 
 Relayer will send Kamaji and declare the resources it needs to be served with, and Kamaji will create, update or delete resources as needed.
 
@@ -100,15 +99,13 @@ Relayer will send Kamaji and declare the resources it needs to be served with, a
 3. Relayer will use the wallets and rpcs returned in the step above to instantiate wallet-manger and start waiting for VAAs
 4. Relayer will start a worker that reads from the pertinent queues.
 
-### Relayer Operations:
+**Relayer Operations:**
 
 1. VAA Streamer will use the stream registry to stay up to date on the VAA for those emitters using as many sources as possible (initially spy and missed-vaa v4)
 2. When a VAA is detected for an emitter, VAA streamer will call the `route()` method to understand what queue the vaa should be routed to. Upon success, it'll forward the vaa to such queue.
 3. If the call to `route()` repeatedly fails, VAA streamer can mark the VAA as stuck and trigger an alert
 4. **Relayer** will process the VAA and post its results to a new **topic** so that they can be post processed by interested parties, such as recording the atomic pnl, recording the vaa status in the vaa-stream-registry or gathering specific metrics.
 
-## Oracles:
-
-### Oracle Bootstrap:
-
-### Oracle Operations:
+### Oracles:
+**Oracle bootstrap**
+**Oracle operations**
