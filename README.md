@@ -1,18 +1,33 @@
 ![kamaji](https://github.com/XLabs/kamaji/assets/12457451/bf60762f-3028-4611-b1db-e0cc66706103)
-## Kamaji, a service oriented relay engine:
+# Why:
+Running an off-chain relayer for cross-chain applications built on wormhole is no easy task. There are multiple things you need to juggle simultaneously: 
+- ensuring **every vaa** is redeemed
+- managing contract interfaces across ecosystems
+- securely providing funds to pay for relaying
+- mantaining relay-protocol contracts configuration up to date
+- many, many more...
 
-Running an off-chain relayer for cross-chain applications built on wormhole is no easy task. There are multiple things you need to juggle simultaneously: making sure you don’t miss any vaa, making sure you have the right interfaces for contracts across different chains on different ecosystems, making sure you have a healthy pool of RPC connections, making sure you have enough funds in the wallets you’ll use to post transactions to destination, making sure you have the relayer contracts configuration up to date… This gets particularly difficult when you, like us at xLabs must run many relayers.
+This gets particularly difficult when you need to run many production grade relayers, like we do at [xLabs](https://xlabs.xyz/).
 
-This is why we created Kamaji, an engine to run and service an *ecosystem of relayers*.
+Enter **Kamaji**, an engine to run and service an ***ecosystem of relayers***.
 
+# What:
 ## High Level Architecture:
+This relay-engine is modeled "service registry" where clients can register their needs to be serviced. As such there are two main roles to distinguish:
+- Clients: Mmainly Relayers and Oracles. The engine focuses on simplifying the spawning and management of this components with minimal code, making it easy to spawn dozens if not hundreds of reliable, predictable, observable relayers.
+- Services: Components purposed to assist clients in performing their tasks by managing all the environment related complexity (rpc pools, wallets, security, pnl tracking, error handling, monitoring, alerting).
 
-From a high-level perspective, there are two sides to the relayer ecosystem: a set of Clients and components servicing the different needs of those clients.
+This aims to abstract away environment complexity out of a relayer, with two main purposes:
+- Allowing the relayer to focus only on the business logic
+- Reusing all infrastructure related code. (TODO: link quote to why)
 
-The goal is to abstract all the complexity related to interacting with the environment on services that can be reused by many relayers so that implementing and maintaining a network of relayers can be as light lift as possible. 
 
 ![image](https://github.com/XLabs/kamaji/assets/12457451/d8c7d0cb-9873-4506-bd74-656e7141b290)
 
+### Client Components:
+
+- **Relayer:** Clients that perform relay. They can be uniquely identified by an ID provided. This ID will be used to login against keycloak This id will have a KMS role associated with it, which will determine what wallets the relayer can use, and how it can use them.
+- **Oracle Tasks:** Worker running contract update tasks when this is required.
 
 ### Service Components:
 
@@ -24,10 +39,8 @@ The goal is to abstract all the complexity related to interacting with the envir
 - **Accountant:** Keeps track of the cost and benefit of operations relayed.
 - **Oracle:** Takes care of monitoring block-chains to provide hooks for oracle-tasks
 
-### Client Components:
 
-- **Relayer:** Clients that perform relay. They can be uniquely identified by an ID provided. This ID will be used to login against keycloak This id will have a KMS role associated with it, which will determine what wallets the relayer can use, and how it can use them.
-- **Oracle Tasks:** Worker running contract update tasks when this is required.
+# Components:
 
 ## Relayer:
 
