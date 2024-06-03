@@ -1,45 +1,46 @@
-# Kamaji
+# Kamaji:
 ![kamaji](https://github.com/XLabs/kamaji/assets/12457451/bf60762f-3028-4611-b1db-e0cc66706103)
 ## What:
-Kamaji is a relay-engine modeled as a "service registry" where clients can register their needs to be serviced. As such there are two main roles to distinguish:
-- Clients: Mainly Relayers and Oracles. The engine focuses on simplifying the spawning and management of this components with minimal code, making it easy to spawn dozens if not hundreds of reliable, predictable, observable relayers.
-- Services: Components purposed to assist clients in performing their tasks by managing all the environment related complexity (rpc pools, wallets, security, pnl tracking, error handling, monitoring, alerting).
+Kamaji is a relay-engine modeled as a "service registry" that aims to make it easy to run an **ecosystem of relayers**.
+
+## Why:
+Running an off-chain relayer for cross-chain applications *built on wormhole** is no easy task. There are multiple things you need to juggle simultaneously: 
+- ensuring **every vaa** is redeemed
+- managing contract interfaces across ecosystems
+- securely providing funds to pay for relaying
+- calculating the correct fee for a relay based on current network conditions
+- tracking the relayer tokens inflows and outflows
+- mantaining relay-protocol contracts configuration up to date
+- and many, many more...
+
+This gets particularly difficult when you need to run **many** production grade relayers, like we do at [xLabs](https://xlabs.xyz/).
+
+## High Level Architecture:
+Kamaji is modeled as a service-registry, where offchain clients can register themselves to be assisted by services that abstract away the complexity of interacting with blockchains.
+The operator, Kamaji, will make sure that services are provided to interested clients.
+From this perspective, you can think of the relayer ecosystem in as being formed of two types of components:
+- *Clients:* Mainly Relayers, Oracles and Watchers. These contain the business logic and the engine focuses on simplifying the spawning and management of this components with minimal code, making it easy to spawn dozens if not hundreds of reliable, predictable and observable relayers.
+- *Services:* Components purposed to assist clients in performing their tasks by managing all the environment related complexity (rpc pools, wallets, security, pnl tracking, error handling, monitoring, alerting).
 
 This aims to abstract all environment complexity out of a relayer, with two main purposes:
 - Allowing the relayer to focus only on the business logic
 - Reusing all infrastructure related code. (TODO: link quote to why)
 
-## Why:
-Running an off-chain relayer for cross-chain applications built on wormhole is no easy task. There are multiple things you need to juggle simultaneously: 
-- ensuring **every vaa** is redeemed
-- managing contract interfaces across ecosystems
-- securely providing funds to pay for relaying
-- calculating the correct fee that should be charged for a relay based on current network conditions
-- tracking the tokens inflows and outflows
-- mantaining relay-protocol contracts configuration up to date
-- many, many more...
-
-This gets particularly difficult when you need to run **many** production grade relayers, like we do at [xLabs](https://xlabs.xyz/).
-
-Enter **Kamaji**, an engine to run and service an ***ecosystem of relayers***.
-
-## 10,000 feet view:
 ![image](https://github.com/XLabs/kamaji/assets/12457451/d8c7d0cb-9873-4506-bd74-656e7141b290)
 
 ### Client Components:
 
 - **Relayer:** Clients that perform relay. They can be uniquely identified by an ID provided. This ID will be used to login against keycloak This id will have a KMS role associated with it, which will determine what wallets the relayer can use, and how it can use them.
-- **Oracle Tasks:** Worker running contract update tasks when this is required. The hooks to understand when this is required are provided by the infrastructure.
+- **Oracle:** Worker running contract update tasks when this is required. The hooks to understand when this is required are provided by the infrastructure.
+- **Observer:** 
 
 ### Service Components:
 
-- **Kamaji:** Acts as a gateway to orchestrate all relay-related services
-- **VAA Stream Registry:** Registers the interest of clients on VAA streams and the status of those VAAs for specific relayers.
-- **Vaa Scanner:** Uses as many sources as possible to keep the relayers in the VAA stream registry as up-to-date as possible with the VAAs signed.
-- **Key Cloak:** Authorization service that allows a relayer to assume a KMS role
-- **KMS:** Key management system. Contains a set of roles, each of which has access to certain actions over certain wallets
-- **Accountant:** Keeps track of the cost and benefit of operations relayed.
-- **Oracle:** Takes care of monitoring block-chains to provide hooks for oracle-tasks
+- **VAA Stream Service:** Subscribe to a stream of VAAs from an emitter. Stream service provides an API to register to `emitted`, `signed`, `re-orged` and `finalized` events.
+- **KMS:** Uses an authorization service to authenticate each component and assign a role to it. Each role has a set of keys associated to it and policies on how can this keys be used.
+- **Accountant:** Provides an easy way to keep track of the cost and benefit of operations performed.
+- **Observer:** Provides hooks to execute tasks based on different criterias applied to the blockchain state, such as triggering a hook when certain threshold is reached.
+- **Rpc Authority:** Provides of healthy RPC nodes for an specified set of chains. Potentially uses the authorization service to allow access to paid RPCs only for certain components.
 
 ## Components:
 
