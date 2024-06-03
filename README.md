@@ -26,7 +26,7 @@ This aims to abstract all environment complexity out of a relayer, with two main
 - Allowing the relayer to focus only on the business logic
 - Reusing all infrastructure related code. (TODO: link quote to why)
 
-![image](https://github.com/XLabs/kamaji/assets/12457451/d8c7d0cb-9873-4506-bd74-656e7141b290)
+![Kamaji](https://github.com/XLabs/kamaji/assets/12457451/7fa4a851-2f7b-46fc-9a99-a437931766ea)
 
 ### Client Components:
 
